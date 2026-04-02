@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAVEN - 멈추면 죽는다</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Black+Han+Sans:400');
+        /* CSS reset & variables */
+        :root {
+            --void-black: #050505;
+            --void-bg: #0a0a0a;
+            --blood-red: #9e0b0f;
+            --blood-hover: #b00d11;
+            --rusted-copper: #c45b42;
+            --text-light: #e0e0e0;
+            --text-muted: #888888;
+            --border-rust: #693222;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--void-black);
+            color: var(--text-light);
+            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Glitch Effect */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+            word-break: keep-all;
+        }
+        .glitch {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text-light);
+            position: relative;
+            text-shadow: 2px 2px var(--blood-red), -2px -2px var(--rusted-copper);
+            animation: glitch-anim 2s infinite;
+        }
+        @media (min-width: 768px) {
+            .glitch { font-size: 2rem; }
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); text-shadow: 2px -2px var(--blood-red), -2px 2px var(--rusted-copper); }
+            40% { transform: translate(-2px, -2px); text-shadow: -2px 2px var(--blood-red), 2px -2px var(--rusted-copper); }
+            60% { transform: translate(2px, 2px); text-shadow: 2px 2px var(--blood-red), -2px -2px var(--rusted-copper); }
+            80% { transform: translate(2px, -2px); text-shadow: -2px -2px var(--blood-red), 2px 2px var(--rusted-copper); }
+            100% { transform: translate(0); }
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Left side / Intro (Mobile: Top, PC: Left fixed) */
+        .intro-section {
+            background: linear-gradient(135deg, var(--void-black) 0%, #1a0202 100%);
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-bottom: 2px solid var(--border-rust);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--blood-red);
+            letter-spacing: 0.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(158, 11, 15, 0.5);
+        }
+        @media (min-width: 768px) {
+            .title { font-size: 5rem; }
+        }
+
+        .btn-start {
+            background-color: var(--blood-red);
+            color: #fff;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(158, 11, 15, 0.4);
+            margin-top: 2rem;
+            text-transform: uppercase;
+        }
+        @media (min-width: 768px) {
+            .btn-start { padding: 1.5rem 3rem; font-size: 1.5rem; }
+        }
+        .btn-start:hover {
+            background-color: var(--blood-hover);
+            box-shadow: 0 0 30px rgba(158, 11, 15, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Right side / Content (Mobile: Bottom scroll, PC: Right scroll) */
+        .content-section {
+            padding: 2rem;
+            background-color: var(--void-bg);
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--rusted-copper);
+            border-bottom: 2px solid var(--border-rust);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            margin-top: 4rem;
+        }
+        @media (min-width: 768px) {
+            .section-title { font-size: 2.5rem; }
+        }
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .info-block {
+            margin-bottom: 2rem;
+            background: rgba(20, 20, 20, 0.8);
+            border-left: 4px solid var(--blood-red);
+            padding: 1.5rem;
+        }
+        .info-block h3 {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        @media (min-width: 768px) {
+            .info-block h3 { font-size: 1.5rem; }
+        }
+
+        /* Factions Grid */
+        .faction-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .faction-card {
+            background: #111;
+            border: 1px solid var(--border-rust);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        @media (min-width: 768px) {
+            .faction-card { padding: 2rem; }
+        }
+
+        .faction-card h3 {
+            color: var(--blood-red);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        @media (min-width: 768px) {
+            .faction-card h3 { font-size: 2rem; }
+        }
+        .faction-card .leader {
+            color: var(--rusted-copper);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        @media (min-width: 768px) {
+            .faction-card .leader { font-size: 1.1rem; }
+        }
+        .faction-card .desc {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+
+        .character-card {
+            background: #1a1a1a;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid #333;
+        }
+        .character-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--rusted-copper);
+        }
+
+        .character-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            object-position: top;
+            filter: grayscale(80%) contrast(1.2);
+            transition: filter 0.3s;
+        }
+        @media (min-width: 768px) {
+            .character-img { height: 250px; }
+        }
+        .character-card:hover .character-img {
+            filter: grayscale(0%) contrast(1.1);
+        }
+
+        .character-info {
+            padding: 1rem;
+        }
+        .character-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-light);
+            margin-bottom: 0.3rem;
+        }
+        @media (min-width: 768px) {
+            .character-name { font-size: 1.2rem; }
+        }
+        .character-role {
+            color: var(--rusted-copper);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        @media (min-width: 768px) {
+            .character-role { font-size: 0.9rem; }
+        }
+        .character-trait {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        @media (min-width: 768px) {
+            .character-trait { font-size: 0.85rem; }
+        }
+
+        /* Scroll Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* PC Layout (min-width: 1024px) */
+        @media (min-width: 1024px) {
+            .container {
+                flex-direction: row;
+                height: 100vh;
+                overflow: hidden;
+            }
+            .intro-section {
+                flex: 0 0 40%;
+                height: 100vh;
+                border-bottom: none;
+                border-right: 2px solid var(--border-rust);
+                position: fixed;
+                left: 0;
+                top: 0;
+            }
+            .content-section {
+                flex: 0 0 60%;
+                margin-left: 40%;
+                height: 100vh;
+                overflow-y: auto;
+                padding: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left / Intro -->
+        <div class="intro-section">
+            <h1 class="title">HAVEN</h1>
+            <div class="glitch-wrapper">
+                <div class="glitch">"멈추면 죽는다. 달리기 위해선 피가 필요하다."</div>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 1rem; max-width: 90%; word-break: keep-all;">
+                멈추면 전멸하는 황야를 달리는 기만적인 이동형 방주.<br>
+                최전방 무대에선 시한부 악단이 피 튀기는 재즈 연주로 좀비의 어그로를 끌고,<br>
+                후방의 아이들은 진실을 모른 채 동화 같은 평화를 누리는 잔혹한 디스토피아 생태계.
+            </p>
+            <a href="https://share.crack.wrtn.ai/flk6en" class="btn-start">입주 심사(성향 테스트) 시작</a>
+        </div>
+
+        <!-- Right / Content -->
+        <div class="content-section">
+            <!-- World Info -->
+            <h2 class="section-title fade-in">세계관 로어</h2>
+            
+            <div class="info-block fade-in">
+                <h3>장르 및 핵심 설정</h3>
+                <p>포스트 아포칼립스, 로드무비, 다크 스릴러, 피카레스크.</p>
+            </div>
+            
+            <div class="info-block fade-in">
+                <h3>세계관 역사</h3>
+                <p>멸망 직후 좀비가 지배하는 황야에서 문명이 붕괴되었다.<br>
+                절멸 위기 속 첫 '악단'의 어그로 끌기로 이동형 생존법을 터득하였고, 현재는 끊임없는 유목 생활과 주기적인 악단 소모(물림 확정), 진실을 은폐한 채 굴러가는 생존 생태계가 유지되고 있다.</p>
+            </div>
+
+            <h2 class="section-title fade-in" style="margin-top: 4rem;">주요 지역</h2>
+            
+            <div class="info-block fade-in">
+                <h3>끝없는 고속도로</h3>
+                <p>핏빛 노을과 황량함. 아스팔트 잔해와 버려진 차량 무더기 속에서 좀비 떼의 끝없는 추격이 이어진다. 멈추면 전멸하며 항상 일정 속도를 유지해야 하고 이탈자에 대한 구조는 없다.</p>
+            </div>
+            <div class="info-block fade-in">
+                <h3>선두 무대 차량</h3>
+                <p>폭발적인 굉음과 피비린내. 캐러밴 대열의 가장 앞장선 곳으로 대형 스피커와 피 묻은 악기들이 있다. 전투와 연주가 동시 진행되며 한 번 탑승 시 하차 불가한 죽음의 연주석.</p>
+            </div>
+            <div class="info-block fade-in">
+                <h3>후방 캐러밴</h3>
+                <p>지속적인 진동과 소음 속 거짓된 평온. 아이들의 조잡한 악기 연습실과 사이비 집회소가 존재한다. 선두 차량의 참상 관측이 통제되며 어른들의 철저한 침묵 카르텔이 이어진다.</p>
+            </div>
+
+            <!-- Factions & Characters -->
+            <h2 class="section-title fade-in" style="margin-top: 4rem;">진영 및 입주민</h2>
+            
+            <div class="faction-grid">
+                <!-- Deadman's Hand -->
+                <div class="faction-card fade-in">
+                    <h3>악단: 데드맨즈 핸드 (Deadman's Hand)</h3>
+                    <div class="leader">리더: 강태온 | 주요 거점: 개조된 대형 장갑차량(선두 무대)</div>
+                    <div class="desc">밤하늘을 수놓는 별빛 같은 연주, 무대 위에서 펼쳐지는 황홀한 꿈의 향연.</div>
+                    
+                    <div class="character-grid">
+                        <div class="character-card">
+                            <img src="./캐디/강태온.png" alt="강태온" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">강태온</div>
+                                <div class="character-role">마에스트로 / 트럼펫</div>
+                                <div class="character-trait">무대를 지휘하는 부드러운 선율, 그림자 속에 미소를 감춘 다정한 지휘자.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/윤세라.png" alt="윤세라" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">윤세라</div>
+                                <div class="character-role">메인보컬 / 색소폰</div>
+                                <div class="character-trait">붉은 장미처럼 피어나는 매혹적인 목소리, 달콤한 속삭임으로 밤을 물들이는 디바.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/한도윤.png" alt="한도윤" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">한도윤</div>
+                                <div class="character-role">재즈 드러머</div>
+                                <div class="character-trait">장난스러운 요정처럼 통통 튀는 리듬, 끊이지 않는 웃음소리로 어둠을 쫓아내는 소년.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/이수아.webp" alt="이수아" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">이수아</div>
+                                <div class="character-role">건반 / 아코디언</div>
+                                <div class="character-trait">수정구슬처럼 맑고 투명한 건반의 요정, 고요한 밤에 내리는 서리처럼 차분한 선율.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blind Ark -->
+                <div class="faction-card fade-in">
+                    <h3>생존자들: 블라인드 아크 (Blind Ark)</h3>
+                    <div class="leader">리더: 최무진 | 주요 거점: 거대한 이동형 캐러밴</div>
+                    <div class="desc">우리의 내일을 지키는 든든한 울타리, 포근한 보금자리를 가꾸는 다정한 손길들.</div>
+                    
+                    <div class="character-grid">
+                        <div class="character-card">
+                            <img src="./캐디/최무진.webp" alt="최무진" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">최무진</div>
+                                <div class="character-role">캐러밴 촌장</div>
+                                <div class="character-trait">모두를 품어주는 거다란 나무그늘, 따뜻하고 듬직한 캐러밴의 든든한 기둥.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/도라희-과자깎기인형.png" alt="도라희" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">도라희</div>
+                                <div class="character-role">신입 파수꾼</div>
+                                <div class="character-trait">어디로 튈지 모르는 토끼처럼 엉뚱한 매력, 알록달록한 꿈을 꾸는 명랑한 파수꾼.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/서유진.webp" alt="서유진" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">서유진</div>
+                                <div class="character-role">보급관 / 정비사</div>
+                                <div class="character-trait">묵묵히 우리의 날개를 고쳐주는 마법사, 안개 낀 새벽처럼 차분하고 기대고 싶은 어른.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/권태호.png" alt="권태호" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">권태호</div>
+                                <div class="character-role">수색대장 / 행동대장</div>
+                                <div class="character-trait">언제나 앞장서서 길을 내어주는 용감한 기사님, 거친 폭풍우도 막아내는 든든한 방패.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daydream -->
+                <div class="faction-card fade-in">
+                    <h3>악단을 동경하는 밴드: 데이드림 (Daydream)</h3>
+                    <div class="leader">리더: 송시우 | 주요 거점: 캐러밴 내부 가장 안전한 격리 구역</div>
+                    <div class="desc">언젠가 무대에 오를 날을 꿈꾸며, 희망찬 노래를 부르는 캐러밴의 작은 새들.</div>
+                    
+                    <div class="character-grid">
+                        <div class="character-card">
+                            <img src="./캐디/송시우.png" alt="송시우" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">송시우</div>
+                                <div class="character-role">베이스 지망</div>
+                                <div class="character-trait">밤하늘의 별자리처럼 세상을 관찰하는 지혜로운 소년, 조용히 책장을 넘기는 예비 학자.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/박지민.webp" alt="박지민" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">박지민</div>
+                                <div class="character-role">보컬 지망</div>
+                                <div class="character-trait">캐러밴을 비추는 가장 눈부신 햇살, 언제나 반짝이는 미소로 노래하는 맑은 종소리.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/정은호.png" alt="정은호" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">정은호</div>
+                                <div class="character-role">기타 지망</div>
+                                <div class="character-trait">작은 별빛처럼 조심스레 반짝이는 소년, 마음속에 커다란 꿈을 품은 수줍은 기타리스트.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/김다슬.png" alt="김다슬" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">김다슬</div>
+                                <div class="character-role">드럼 지망</div>
+                                <div class="character-trait">솜사탕처럼 달콤하고 톡톡 튀는 웃음, 캐러밴 구석구석을 누비는 귀여운 말괄량이.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requiem -->
+                <div class="faction-card fade-in">
+                    <h3>캐러밴의 썩은 희망: 레퀴엠 (Requiem)</h3>
+                    <div class="leader">리더: 백마리 | 주요 거점: 캐러밴 내 임시 제단</div>
+                    <div class="desc">기적을 믿으며 내일을 노래하는, 캐러밴에 축복을 내리는 따스한 빛의 안식처.</div>
+                    
+                    <div class="character-grid">
+                        <div class="character-card">
+                            <img src="./캐디/백마리.png" alt="백마리" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">백마리</div>
+                                <div class="character-role">광신도 교주</div>
+                                <div class="character-trait">모두의 상처를 보듬는 따스한 봄바람, 부드러운 목소리로 기적을 노래하는 천사.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/록쇼-록쇼.png" alt="록쇼" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">록쇼</div>
+                                <div class="character-role">이단 척결 청소부</div>
+                                <div class="character-trait">구름 위를 걷는 듯한 순수한 발걸음, 언제나 유쾌한 웃음을 선물하는 캐러밴의 마스코트.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/류진우.png" alt="류진우" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">류진우</div>
+                                <div class="character-role">수석 사제 / 심문관</div>
+                                <div class="character-trait">흔들림 없는 나침반처럼 길을 안내하는 인도자, 고요한 호수처럼 깊고 경건한 기도.</div>
+                            </div>
+                        </div>
+                        <div class="character-card">
+                            <img src="./캐디/기요한.webp" alt="기요한" class="character-img" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22250%22%20viewBox%3D%220%200%20200%20250%22%3E%3Crect%20fill%3D%22%23333%22%20width%3D%22200%22%20height%3D%22250%22%2F%3E%3C%2Fsvg%3E'">
+                            <div class="character-info">
+                                <div class="character-name">기요한</div>
+                                <div class="character-role">성가대 / 신탁 전달자</div>
+                                <div class="character-trait">동화책에서 튀어나온 듯한 해맑은 미소, 구름 위를 둥둥 떠다니는 몽환적인 소년.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem; padding-bottom: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                © 2026 HAVEN Universe. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll animation observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.fade-in').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
